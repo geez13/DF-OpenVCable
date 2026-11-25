@@ -1,0 +1,65 @@
+MSBuild version 17.14.60+43b635718 for .NET Framework
+Build started 11/25/2026 10:28:23 AM.
+
+Project "D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj" on node 1 (default targets).
+DriverBuildNotifications:
+  Building 'mcvad' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+  Using KMDF 1.15.
+PrepareForBuild:
+  Creating directory "x64\Release\".
+  Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+  Creating directory "x64\Release\mcvad.tlog\".
+InitializeBuildStatus:
+  Creating "x64\Release\mcvad.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+  Touching "x64\Release\mcvad.tlog\unsuccessfulbuild".
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\CL.exe /c /I..\src /Ix64\Release\ /Zi /nologo /W3 /WX- /diagnostics:column /Ox /Os /Oy- /D _WIN64 /D _AMD64_ /D AMD64 /D _WIN64 /D _AMD64_ /D AMD64 /D _WIN32_WINNT=0x0A00 /D WINVER=0x0A00 /D WINNT=1 /D NTDDI_VERSION=0xA000010 /GF /Gm- /Zp8 /GS /guard:cf /Gy /fp:precise /Zc:wchar_t- /Zc:forScope /Zc:inline /GR- /Fo"x64\Release\\" /Fd"x64\Release\vc143.pdb" /external:W3 /Gz /wd4603 /wd4627 /wd4986 /wd4987 /FI"C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared\warning.h" /FC /errorReport:queue /kernel -cbstring -d2epilogunwind  /d1nodatetime /d1import_no_registry /d2AllowCompatibleILVersions /d2Zi+ ..\src\adapter.cpp ..\src\minwavert.cpp ..\src\mintopo.cpp ..\src\ringbuffer.cpp
+  adapter.cpp
+C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  minwavert.cpp
+C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  mintopo.cpp
+C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  ringbuffer.cpp
+C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  Generating Code...
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"D:\a\DF-OpenVCable\DF-OpenVCable\package\x64\Release\mcvad.sys" /VERSION:"10.0" /INCREMENTAL:NO /NOLOGO /WX /SECTION:"INIT,d" portcls.lib stdunk.lib ntstrsafe.lib "C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\km\x64\BufferOverflowFastFailK.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\km\x64\ntoskrnl.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\km\x64\hal.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\km\x64\wmilib.lib" /NODEFAULTLIB /MANIFEST:NO /DEBUG /PDB:"D:\a\DF-OpenVCable\DF-OpenVCable\package\x64\Release\mcvad.pdb" /SUBSYSTEM:NATIVE,"10.00" /Driver /OPT:REF /OPT:ICF /ENTRY:"GsDriverEntry" /RELEASE /IMPLIB:"D:\a\DF-OpenVCable\DF-OpenVCable\package\x64\Release\mcvad.lib" /MERGE:"_TEXT=.text;_PAGE=PAGE" /MACHINE:X64 /PROFILE /guard:cf /kernel /IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 /osversion:10.0 /pdbcompress /debugtype:pdata x64\Release\adapter.obj
+  x64\Release\minwavert.obj
+  x64\Release\mintopo.obj
+  x64\Release\ringbuffer.obj
+  mcvad.vcxproj -> D:\a\DF-OpenVCable\DF-OpenVCable\package\x64\Release\mcvad.sys
+DriverPackageTarget:
+  Packaging up the following projects for the following configurations:
+  
+   Configuration='' Platform=''
+  
+  
+  The following files will be packaged:
+  
+  File to package:      .
+  Location in Package:  .
+  Requested by project: 
+  
+  
+DrvCat:
+  DrvCat task was skipped as there was no catalog file to process
+  
+FinalizeBuildStatus:
+  Deleting file "x64\Release\mcvad.tlog\unsuccessfulbuild".
+  Touching "x64\Release\mcvad.tlog\mcvad.lastbuildstate".
+Done Building Project "D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj" (default targets).
+
+Build succeeded.
+
+"D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj" (default target) (1) ->
+(ClCompile target) -> 
+  C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+  C : \program files (x86)\windows kits\10\include\10.0.26100.0\km\stdunk.h  warning : operator new and operator delete will be removed soon [D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.vcxproj]
+
+    4 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:09.85
