@@ -58,6 +58,9 @@ __pycache__/
 .venv/
 venv/
 
+# ---- Output build macOS (macos/) ----
+macos/build/
+
 # ---- OS & editor ----
 Thumbs.db
 desktop.ini

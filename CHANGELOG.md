@@ -1,5 +1,15 @@
 # Changelog: DF-OpenVCable (DimzFrantic Open Virtual Audio Cable)
 
+## [1.0.0-macos] - 2026-11-25
+
+### Added
+- **Port native macOS (`macos/`)**:
+  - **All-in-One CoreAudio HAL `AudioServerPlugIn`** (`macos/driver/DFOpenVCableDriver.cpp`, `macos/driver/ring_buffer.h`, `macos/driver/dfovc_protocol.h`, `macos/driver/Info.plist`): satu bundle `DF-OpenVCable.driver` universal (`arm64` + `x86_64`) yang langsung menyediakan 5 pasang Virtual Audio Cable independen (`DF-OpenVCable A` s/d `DF-OpenVCable E`) dengan kontrol Volume & Mute native, dukungan dinamis 44.1/48/88.2/96/192 kHz, buffer 50–2000 ms, clock zero-drift berbasis `mach_absolute_time()`, dan penyimpanan persisten via `coreaudiod` host storage.
+  - **Native macOS Control Panel** (`macos/control_panel/DFOpenVCableControlPanel.swift`): aplikasi SwiftUI (`DF-OpenVCable Control Panel.app`) dengan 5 tab kabel, kontrol konfigurasi live, meter peak Playback/Capture, bar utilisasi ring buffer, dan penghitung overrun/underrun.
+  - **CLI & Live Audio Loopback Tester** (`macos/cli/dfovc_ctl.swift`): utilitas `dfovc-ctl` (`list`, `status [--json]`, `config`, `reset-stats`, `loopback-test`) yang menguji aliran audio 1 kHz live melalui CoreAudio HAL dengan analisis RMS & Goertzel.
+  - **Build, Packaging, & Deployment** (`macos/Makefile`, `macos/scripts/install.sh`, `uninstall.sh`, `reload.sh`, `selftest.sh`): kompilasi mandiri cukup dengan Xcode Command Line Tools (tanpa Xcode.app), otomatis ad-hoc code-signed untuk Apple Silicon.
+  - **Automated Tests & CI** (`macos/tests/test_ring_buffer.cpp`, `macos/tests/test_driver_plugin.cpp`, `.github/workflows/build-macos.yml`, `docs/VALIDATION_MACOS.md`): unit test ring buffer + integration test `dlopen` `AudioServerPlugIn` + workflow GitHub Actions macOS.
+
 ## [1.0.0.14] - 2026-11-25
 
 ### Fixed

@@ -1,31 +1,82 @@
 # DF-OpenVCable (DimzFrantic Open Virtual Audio Cable)
 
-**DF-OpenVCable** adalah driver audio virtual kernel-mode tingkat lanjut (WDM/WaveRT) untuk sistem operasi Windows 10 dan Windows 11 (64-bit).
+**DF-OpenVCable** adalah driver audio virtual lintas platform untuk **Windows 10/11 (64-bit, WDM/WaveRT kernel-mode)** dan **macOS 13+ (Apple Silicon `arm64` & Intel `x86_64`, CoreAudio HAL `AudioServerPlugIn`)**.
 
-Proyek ini menghadirkan arsitektur **All-in-One Single Driver**: satu file binary kernel (`mcvad.sys`) dan satu file instalasi (`.inf`) yang langsung menyediakan **5 pasang Virtual Audio Cable independen** secara simultan tanpa memecah-mecah driver menjadi beberapa paket terpisah.
+Proyek ini menghadirkan arsitektur **All-in-One Single Driver**: satu paket driver tunggal (`mcvad.sys` di Windows atau `DF-OpenVCable.driver` di macOS) yang langsung menyediakan **5 pasang Virtual Audio Cable independen** secara simultan tanpa memecah-mecah driver menjadi beberapa paket terpisah.
 
 ## 🎛️ Daftar Endpoint Audio (5 Pasang Kabel Independen)
-1. **DF-OpenVCable 1 (Main)**: Render & Capture
-2. **DF-OpenVCable A**: Render & Capture
-3. **DF-OpenVCable B**: Render & Capture
-4. **DF-OpenVCable C**: Render & Capture
-5. **DF-OpenVCable D**: Render & Capture
+1. **DF-OpenVCable A**: Output / Playback & Input / Capture
+2. **DF-OpenVCable B**: Output / Playback & Input / Capture
+3. **DF-OpenVCable C**: Output / Playback & Input / Capture
+4. **DF-OpenVCable D**: Output / Playback & Input / Capture
+5. **DF-OpenVCable E**: Output / Playback & Input / Capture
 
-Setiap sinyal audio yang diputar ke perangkat Playback/Render secara otomatis dialirkan secara *loss-free* dan *zero-latency* ke perangkat Recording/Capture pada kabel yang bersangkutan melalui memori kernel non-paged pool.
+Setiap sinyal audio yang diputar ke perangkat Playback/Output secara otomatis dialirkan secara *loss-free* dan *zero-clock-drift* ke perangkat Recording/Input pada kabel yang bersangkutan melalui ring buffer memori internal driver.
 
 ---
 
 ## Fitur Utama
-- **WaveRT Modern Architecture**: Menggunakan interface `IMiniportWaveRT` standar Windows 10/11 untuk latensi ultra rendah dan efisiensi CPU.
-- **Zero Clock Drift Streaming**: Sinkronisasi transfer data menggunakan `KeQueryPerformanceCounter` (QPC) presisi tinggi untuk mencegah audio glitch, stutter, dan dropouts.
-- **Dynamic Buffer Resizing**: Konfigurasi ukuran buffer (50 ms hingga 2000 ms) dan sample rate (44.1 kHz hingga 192 kHz) dapat diubah langsung saat runtime via IOCTL.
-- **Control Panel GUI**: Tersedia aplikasi pengatur berbasis Python (Tkinter) dan Win32 C++ native dengan meter beban buffer dan penghitung glitch real-time.
-- **One-Click Deployment**: Installer mandiri (`install.bat`) dan uninstaller (`uninstall.bat`) tanpa dependensi utility eksternal seperti `devcon.exe`.
-- **Automated CI/CD**: Dilengkapi workflow GitHub Actions untuk build dan packaging otomatis.
+- **Windows WaveRT Modern Architecture**: Menggunakan interface `IMiniportWaveRT` standar Windows 10/11 untuk latensi ultra rendah dan efisiensi CPU.
+- **macOS CoreAudio HAL `AudioServerPlugIn`**: Driver user-space resmi Apple (`DF-OpenVCable.driver`, Universal `arm64` + `x86_64`) yang berjalan aman di dalam `coreaudiod` tanpa perlu menonaktifkan SIP atau memasang kernel extension (`.kext`).
+- **Zero Clock Drift Streaming**: Sinkronisasi transfer data presisi tinggi (`KeQueryPerformanceCounter` di Windows; `mach_absolute_time` + timestamp-indexed lock-free ring buffer di macOS) untuk mencegah audio glitch, stutter, dan dropouts.
+- **Dynamic Configuration & Persistence**: Pengaturan buffer duration (50 ms hingga 2000 ms), sample rate (44.1 kHz hingga 192 kHz di macOS), mute/enable per-kabel, serta volume native tersimpan persisten lintas reboot.
+- **Native Control Panel GUI & CLI**:
+  - Windows: Python (Tkinter) dan Win32 C++ native.
+  - macOS: Aplikasi native SwiftUI (`DF-OpenVCable Control Panel.app`) dengan meter level audio real-time dan CLI (`dfovc-ctl`) lengkap dengan uji loopback 1 kHz.
+- **One-Click Deployment**: Skrip installer & uninstaller mandiri (`package/install.bat` di Windows; `macos/scripts/install.sh` di macOS).
+- **Automated CI/CD**: Dilengkapi workflow GitHub Actions untuk build dan packaging otomatis Windows & macOS.
 
 ---
 
-## Panduan Instalasi Cepat
+## Panduan Instalasi Cepat — macOS (Apple Silicon & Intel)
+
+### Syarat Sistem:
+- **macOS 13.0 (Ventura) atau lebih baru** (`arm64` / `x86_64`).
+- Tidak memerlukan disable SIP.
+- Untuk build dari source: cukup **Xcode Command Line Tools** (`xcode-select --install`).
+
+### Build & Pemasangan dari Source:
+```bash
+cd macos
+
+# Kompilasi Universal Binary (arm64 + x86_64): driver, Control Panel .app, & CLI
+make
+
+# Jalankan unit test ring buffer + integration test AudioServerPlugIn
+make test
+
+# Pasang ke /Library/Audio/Plug-Ins/HAL, /Applications, dan /usr/local/bin
+./scripts/install.sh
+```
+
+### Menjalankan Control Panel & CLI (macOS):
+- **GUI Native**: Buka `/Applications/DF-OpenVCable Control Panel.app`.
+- **CLI**:
+  ```bash
+  dfovc-ctl list
+  dfovc-ctl status
+  dfovc-ctl config A --rate 96000 --buffer 250
+  ```
+
+### Verifikasi Instalasi & Uji Audio Loopback (macOS):
+Panduan lengkap tersedia di **`docs/VALIDATION_MACOS.md`**.
+
+```bash
+# Cek status instalasi, signature, arsitektur, dan 5 endpoint CoreAudio
+./macos/scripts/selftest.sh
+
+# Uji audio loopback 1 kHz secara langsung via CoreAudio (Output -> Input)
+dfovc-ctl loopback-test A
+```
+
+### Pencabutan / Uninstall Bersih (macOS):
+```bash
+./macos/scripts/uninstall.sh
+```
+
+---
+
+## Panduan Instalasi Cepat — Windows 10/11 (x64)
 
 ### Unduh Paket Siap Pakai (tanpa login)
 Build CI terbaru selalu tersedia di halaman rilis:

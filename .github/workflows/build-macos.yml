@@ -1,0 +1,73 @@
+name: Build DF-OpenVCable macOS Driver & Package
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'macos/**'
+      - 'docs/VALIDATION_MACOS.md'
+      - '.github/workflows/build-macos.yml'
+      - 'README.md'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'macos/**'
+      - 'docs/VALIDATION_MACOS.md'
+      - '.github/workflows/build-macos.yml'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check Toolchain
+        run: |
+          sw_vers
+          uname -m
+          clang++ --version
+          swiftc --version
+
+      - name: Lint Shell Scripts
+        run: |
+          for f in macos/scripts/*.sh; do
+            bash -n "$f"
+            echo "OK  $f"
+          done
+
+      - name: Build Universal Driver, Control Panel, CLI & Run Unit Tests
+        run: |
+          make -C macos UNIVERSAL=1 package
+
+      - name: Verify Universal Binaries & Signatures
+        run: |
+          set -e
+          lipo -info "macos/build/DF-OpenVCable.driver/Contents/MacOS/DF-OpenVCable"
+          lipo -info "macos/build/DF-OpenVCable Control Panel.app/Contents/MacOS/DFOpenVCableControlPanel"
+          lipo -info "macos/build/dfovc-ctl"
+          codesign --verify --deep --strict "macos/build/DF-OpenVCable.driver"
+          codesign --verify --deep --strict "macos/build/DF-OpenVCable Control Panel.app"
+          codesign --verify --strict "macos/build/dfovc-ctl"
+          plutil -lint "macos/build/DF-OpenVCable.driver/Contents/Info.plist"
+          plutil -lint "macos/build/DF-OpenVCable Control Panel.app/Contents/Info.plist"
+          nm -gU "macos/build/DF-OpenVCable.driver/Contents/MacOS/DF-OpenVCable" | grep "_DFOpenVCable_Create"
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DF-OpenVCable-v1.0.0-macOS-universal
+          path: macos/build/DF-OpenVCable-v1.0.0-macOS-universal.zip
+
+      - name: Publish macOS Bundle to Rolling Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-build
+          name: DF-OpenVCable - Latest CI Build
+          prerelease: true
+          overwrite_files: true
+          files: macos/build/DF-OpenVCable-v1.0.0-macOS-universal.zip

@@ -42,3 +42,35 @@ Windows Audio Subsystem (PortCls) mengizinkan satu adapter mendaftarkan banyak s
 | Proses Instalasi | 3x install & 3x reboot | 1x install tunggal |
 | Endpoint Aktif | 1 s/d 5 kabel (tergantung paket yang dibeli) | 5 kabel langsung aktif |
 | Basis Miniport | PortCls WaveRT / WaveCyclic hybrid | Murni WaveRT Modern |
+
+---
+
+## 4. Arsitektur Versi macOS (`macos/`)
+
+Di macOS, DF-OpenVCable diimplementasikan sebagai satu **CoreAudio HAL `AudioServerPlugIn`** (`DF-OpenVCable.driver`, Universal `arm64` + `x86_64`) yang dimuat langsung oleh daemon `coreaudiod` di `/Library/Audio/Plug-Ins/HAL/`:
+
+```
+                    ┌─── [ DF-OpenVCable.driver (AudioServerPlugIn) ] ───┐
+                    │                                                    │
+[ App 1 Output ] ──► [ DF-OpenVCable A Out ] ──► (Timestamp Ring 0) ──► [ DF-OpenVCable A In ] ──► [ App 1 Rec ]
+[ App 2 Output ] ──► [ DF-OpenVCable B Out ] ──► (Timestamp Ring 1) ──► [ DF-OpenVCable B In ] ──► [ App 2 Rec ]
+[ App 3 Output ] ──► [ DF-OpenVCable C Out ] ──► (Timestamp Ring 2) ──► [ DF-OpenVCable C In ] ──► [ App 3 Rec ]
+[ App 4 Output ] ──► [ DF-OpenVCable D Out ] ──► (Timestamp Ring 3) ──► [ DF-OpenVCable D In ] ──► [ App 4 Rec ]
+[ App 5 Output ] ──► [ DF-OpenVCable E Out ] ──► (Timestamp Ring 4) ──► [ DF-OpenVCable E In ] ──► [ App 5 Rec ]
+                    └────────────────────────────────────────────────────┘
+```
+
+### Komponen Inti macOS
+1. **HAL Plug-In (`macos/driver/DFOpenVCableDriver.cpp`)**:
+   - Mengekspor factory `DFOpenVCable_Create` dan mendaftarkan 5 `AudioDevice` duplex independen (`DF-OpenVCable A` .. `E`), masing-masing memiliki stream Input & Output 32-bit Float Stereo serta kontrol Volume & Mute native.
+   - Clock zero-drift berbasis `mach_absolute_time()` (`GetZeroTimeStamp`) dengan `kAudioDeviceClockAlgorithmRaw`.
+   - Perubahan sample rate (`44.1` / `48` / `88.2` / `96` / `192 kHz`) dan ukuran ring buffer (`50`–`2000 ms`) diproses aman melalui protokol `RequestDeviceConfigurationChange` → `PerformDeviceConfigurationChange`.
+   - Persistensi pengaturan lintas restart `coreaudiod` dan reboot menggunakan `AudioServerPlugInHostInterface::WriteToStorage` / `CopyFromStorage`.
+2. **Timestamp-Indexed Ring Buffer (`macos/driver/ring_buffer.h`)**:
+   - Lock-free dan bebas alokasi pada thread IO real-time CoreAudio.
+   - Diindeks langsung dengan `mSampleTime` (`WriteMix` menulis ke `mOutputTime`, `ReadInput` membaca dari `mInputTime` pada clock perangkat yang sama), menghasilkan loopback bit-exact tanpa drift dan tanpa glitch.
+3. **IPC Sandboxed via Custom CoreAudio Properties (`macos/driver/dfovc_protocol.h`)**:
+   - Properti `CFPropertyList` (`dfst`, `dfcs`, `dfcc`, `dfrs`) memungkinkan Control Panel dan CLI berkomunikasi langsung dengan driver di dalam sandbox `coreaudiod` tanpa perlu hak akses root saat runtime.
+4. **Control Panel & CLI (`macos/control_panel/`, `macos/cli/`)**:
+   - `DF-OpenVCable Control Panel.app`: GUI native SwiftUI dengan 5 tab kabel, kontrol sample rate/buffer/volume/mute/enable, serta meter peak & diagnostik real-time.
+   - `dfovc-ctl`: CLI untuk manajemen perangkat dan pengujian loopback tone 1 kHz live via CoreAudio HAL.
