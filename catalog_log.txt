@@ -1,0 +1,65 @@
+Inf2Cat.exe  : C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\Inf2Cat.exe
+signtool.exe : C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe
+mcvad.sys size: 23552 bytes
+Sertifikat test signing dibuat: 67EB55DE3516226D21E66A066002CE9B6A19D986
+=== Inf2Cat output ===
+.......................................................
+Signability test complete.
+
+Errors:
+None
+
+Warnings:
+None
+
+Catalog generation complete.
+D:\a\DF-OpenVCable\DF-OpenVCable\package\mcvad.cat
+
+Inf2Cat exit code: 0
+mcvad.cat berhasil dibuat: 1101 bytes
+=== signtool mcvad.sys ===
+The following certificate was selected:
+    Issued to: MCVAD CI Test Certificate
+
+    Issued by: MCVAD CI Test Certificate
+
+    Expires:   Tue Nov 25 10:28:37 2031
+
+    SHA1 hash: 67EB55DE3516226D21E66A066002CE9B6A19D986
+
+
+Done Adding Additional Store
+Successfully signed: package/mcvad.sys
+
+
+Number of files successfully Signed: 1
+
+Number of warnings: 0
+
+Number of errors: 0
+
+
+signtool sys exit code: 0
+=== signtool mcvad.cat ===
+The following certificate was selected:
+    Issued to: MCVAD CI Test Certificate
+
+    Issued by: MCVAD CI Test Certificate
+
+    Expires:   Tue Nov 25 10:28:37 2031
+
+    SHA1 hash: 67EB55DE3516226D21E66A066002CE9B6A19D986
+
+
+Done Adding Additional Store
+Successfully signed: package/mcvad.cat
+
+
+Number of files successfully Signed: 1
+
+Number of warnings: 0
+
+Number of errors: 0
+
+
+signtool cat exit code: 0
